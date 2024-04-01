@@ -3,31 +3,29 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+         #
+#    By: hoigag <hoigag@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/27 11:05:58 by ogorfti           #+#    #+#              #
-#    Updated: 2023/11/07 09:58:04 by ogorfti          ###   ########.fr        #
+#    Updated: 2024/03/30 19:17:54 by hoigag           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CXX = c++
 
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror   -I./include -I./parsing -std=c++98 #-fsanitize=address -g
 
-SERVER =	${addprefix src/, main.cpp}
+SRCS = $(wildcard srcs/cgi/*.cpp) $(wildcard srcs/server/*.cpp) $(wildcard srcs/response/*.cpp) $(wildcard srcs/*.cpp) $(wildcard srcs/parsing/*.cpp)
 
-SRCS = $(SERVER)
+HEADERS = $(wildcard include/*.hpp) $(wildcard parsing/*.hpp)
 
 OBJ_DIR = obj
 
 OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
-RM = rm -rf
-
 NAME = webserv
 
 $(OBJ_DIR)/%.o: %.cpp
-	mkdir -p $(@D)
+	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 all: $(NAME)
@@ -37,9 +35,14 @@ $(NAME): $(OBJS)
 	@echo "\033[1;32mDONE!\033[0m"
 
 clean:
-	$(RM) $(OBJ_DIR)
+	rm -rf $(OBJ_DIR)
 
 fclean: clean
-	$(RM) $(NAME)
+	rm -f $(NAME)
 
 re: fclean all
+
+run: all
+	./$(NAME) config/default.conf
+
+.PHONY: all clean fclean re
